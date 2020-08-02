@@ -41,6 +41,7 @@ Vagrant.configure("2") do |config|
 
         c.vm.provision :shell, :path => "scripts/vagrant-setup-routes.bash"
         c.vm.provision :shell, :path => "scripts/vagrant-setup-hosts-file.bash"
+        c.vm.provision :shell, :inline => "sudo apt-get install -y nfs-common"
     end
   end
 
@@ -49,5 +50,10 @@ Vagrant.configure("2") do |config|
       c.vm.network "private_network", ip: "192.168.199.30"
 
       c.vm.provision :shell, :path => "scripts/vagrant-setup-routes.bash"
+  end
+
+  config.vm.define "storage-0" do |c|
+      c.vm.hostname = "storage-0"
+      c.vm.network "private_network", ip: "192.168.199.31"
   end
 end

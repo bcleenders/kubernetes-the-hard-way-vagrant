@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# shellcheck source=versions.bash
+source "${dir}/versions.bash"
+
+pushd "${dir}/../"
+trap 'popd' EXIT
+
+for i in {0..0}; do
+  cat <<EOF | vagrant ssh "storage-${i}" -- sudo bash
+
+	sudo apt install -y nfs-kernel-server
+	sudo mkdir -p {/mnt/nfs_share/share_0,/mnt/nfs_share/share_1,/mnt/nfs_share/share_2,/mnt/nfs_share/share_3,/mnt/nfs_share/share_4}
+	sudo chown -R nobody:nogroup /mnt/nfs_share/
+	sudo chmod -R 777 /mnt/nfs_share/
+
+	cat <<- "EOEXPORTS" >> /etc/exports
+	/mnt/nfs_share/share_0  192.168.199.0/24(rw,sync,no_subtree_check)
+	/mnt/nfs_share/share_1  192.168.199.0/24(rw,sync,no_subtree_check)
+	/mnt/nfs_share/share_2  192.168.199.0/24(rw,sync,no_subtree_check)
+	/mnt/nfs_share/share_3  192.168.199.0/24(rw,sync,no_subtree_check)
+	/mnt/nfs_share/share_4  192.168.199.0/24(rw,sync,no_subtree_check)
+	EOEXPORTS
+
+	sudo exportfs -a
+EOF
+done

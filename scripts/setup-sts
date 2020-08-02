@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+pushd "${dir}/../"
+trap 'popd' EXIT
+
+cat <<'EOF' | kubectl apply -f -
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-sts
+spec:
+  selector:
+    app: sts-web
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  serviceName: "nginx-sts"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sts-web
+  template:
+    metadata:
+      labels:
+        app: sts-web
+    spec:
+      containers:
+      - name: nginx
+        image: k8s.gcr.io/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: nfsdata
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: nfsdata
+    spec:
+      storageClassName: mynfs
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+EOF

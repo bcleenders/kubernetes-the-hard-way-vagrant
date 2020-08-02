@@ -25,3 +25,10 @@ echo -e "\033[1mFinished. Cluster should be healthy and soon in state ready:\033
 kubectl get componentstatuses
 kubectl get nodes
 kubectl apply -f manifests/coredns.yaml
+
+# Now set up our NFS server
+./scripts/setup-nfs
+./scripts/setup-persistent-volumes
+
+# And using them to store nginx data
+./scripts/setup-sts
