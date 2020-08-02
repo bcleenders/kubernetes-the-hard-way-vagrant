@@ -1,14 +1,3 @@
-#!/bin/bash
-
-set -euo pipefail
-
-readonly dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-pushd "${dir}/../"
-trap 'popd' EXIT
-
-cat <<'EOF' | kubectl apply -f -
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -57,4 +46,3 @@ spec:
       resources:
         requests:
           storage: 1Gi
-EOF

@@ -14,7 +14,10 @@ for i in {0..0}; do
   cat <<EOF | vagrant ssh "storage-${i}" -- sudo bash
 
 	sudo apt install -y nfs-kernel-server
-	sudo mkdir -p {/mnt/nfs_share/share_0,/mnt/nfs_share/share_1,/mnt/nfs_share/share_2,/mnt/nfs_share/share_3,/mnt/nfs_share/share_4}
+
+	for k in {0..4}; do mkdir -p "/mnt/nfs_share/share_\$k"; done
+	for k in {0..4}; do echo '<html><h1>Hello World!</h1><p>Welcome to NFS share '\$k'</p></html>' >> "/mnt/nfs_share/share_\$k/index.html"; done
+
 	sudo chown -R nobody:nogroup /mnt/nfs_share/
 	sudo chmod -R 777 /mnt/nfs_share/
 

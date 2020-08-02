@@ -26,9 +26,14 @@ kubectl get componentstatuses
 kubectl get nodes
 kubectl apply -f manifests/coredns.yaml
 
+# Start Traefik
+./scripts/setup-traefik
+
 # Now set up our NFS server
 ./scripts/setup-nfs
-./scripts/setup-persistent-volumes
+./scripts/setup-persistent-volumes # bash so we can for loop
 
-# And using them to store nginx data
-./scripts/setup-sts
+kubectl apply -f manifests/stateful-set.yaml
+kubectl apply -f manifests/nginx-ingress.yaml
+
+echo "All done, curl http://192.168.199.30 to access NFS shares."

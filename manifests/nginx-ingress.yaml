@@ -1,15 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-external
+spec:
+  selector:
+    app: sts-web
+  ports:
+  - port: 80
+    name: web
+  clusterIP: 10.32.0.222
+
+---
+
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: nginx
-  namespace: default
+  name: bramsingress
+  # namespace: default
   annotations:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: nginx.kthw
-    http:
+  - http:
       paths:
       - backend:
-          serviceName: nginx
-          servicePort: 8080
+          serviceName: nginx-external
+          servicePort: 80
